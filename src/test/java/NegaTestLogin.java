@@ -1,40 +1,36 @@
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class NegaTestLogin {
 
-    public static void main(String[] args) {
-        {
-            System.setProperty("webdriver.edge.driver", "C:\\drivers\\msedgedriver.exe");
+    WebDriver driver;
 
-            WebDriver driver = new EdgeDriver();
+    @BeforeEach
+    void setUp() {
+        System.setProperty("webdriver.edge.driver", "C:\\drivers\\msedgedriver.exe");
+        driver = new EdgeDriver();
+        driver.get("https://www.saucedemo.com/");
+    }
 
-            driver.get("https://www.saucedemo.com/");
+    @Test
+    void loginNegativeTest() {
+        driver.findElement(By.name("user-name")).sendKeys("wrong_user");
+        driver.findElement(By.name("password")).sendKeys("secret_sauce");
+        driver.findElement(By.id("login-button")).click();
 
-            driver.findElement(By.name("user-name")).sendKeys("пизденка");
+        String errorText = driver
+                .findElement(By.cssSelector("[data-test='error']"))
+                .getText();
 
-            driver.findElement(By.name("password")).sendKeys("secret_sauce");
+        assertTrue(errorText.contains("Epic sadface"));
+    }
 
-            driver.findElement(By.id("login-button")).click();
-
-            String errorText = driver
-                    .findElement(By.cssSelector("[data-test='error']"))
-                    .getText();
-
-            if (errorText.contains("Epic sadface")) {
-                System.out.println("TEST PASSED");
-            } else {
-                System.out.println("TEST FAILED");
-            }
-
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            driver.quit();
-        }
+    @AfterEach
+    void tearDown() {
+        driver.quit();
     }
 }
